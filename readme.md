@@ -1,3 +1,8 @@
+# Brainless Bot
+
+Brainless Bot is a simple humanoid robot that kicks balls. 
+It’s not smart, but it tries its best! ⚽🤖
+
 ## Features
 - WiFi web interface for remote control
 - L298N motor driver with PID control
@@ -98,3 +103,4 @@ Edit `include/config.h` to change:
 - Check Serial Monitor for errors
 - Verify sensor connections
 - Ensure proper power supply
+
