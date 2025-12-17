@@ -6,6 +6,8 @@ PIDController::PIDController(float p, float i, float d)
     maxOutput(MAX_SPEED), minOutput(-MAX_SPEED) {}
 
 float PIDController::compute(float setpoint, float measured, float dt) {
+  if(dt <= 0) return 0;
+  
   float error = setpoint - measured;
   integral += error * dt;
   

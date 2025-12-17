@@ -14,7 +14,7 @@ private:
   float accelX, accelY, accelZ;
   float gyroX, gyroY, gyroZ;
   float distance;
-
+  unsigned long lastIMUTime;
 public:
   Sensors();
   void begin();
