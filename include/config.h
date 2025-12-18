@@ -1,9 +1,11 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-// ===== WiFi Configuration =====
-#define WIFI_SSID "brainless robot"
-#define WIFI_PASSWORD "Yarrab"
+
+// ===== Access Point Settings =====
+#define AP_SSID        "brainlessbot"
+#define AP_PASSWORD    "yarab"
+
 
 // ===== L298N Motor Driver Pins =====
 #define MOTOR_ENA 5
