@@ -20,7 +20,7 @@ void setup() {
   delay(1000);
 Serial.println("Hello ESP"); 
   WiFi.mode(WIFI_AP);
-  WiFi.softAP("brainless", "yarab");
+  WiFi.softAP("brainless", "12345678");
 
   Serial.println("✓ ESP32 Access Point Started");
   Serial.print("IP Address: ");

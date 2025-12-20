@@ -3,8 +3,8 @@
 
 
 // ===== Access Point Settings =====
-#define AP_SSID        "brainlessbot"
-#define AP_PASSWORD    "yarab"
+#define AP_SSID        "brainless"
+#define AP_PASSWORD    "12345678"
 
 
 // ===== L298N Motor Driver Pins =====

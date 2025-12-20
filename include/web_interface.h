@@ -5,23 +5,18 @@
 #include <ESP32Servo.h>
 
 class WebInterface {
+public:
+  WebInterface();
+  void begin();
+  void handleClient();
+
 private:
   WebServer server;
   Servo armServo;
   int armPosition;
 
-public:
-  WebInterface();
-  void begin();
-  void handleClient();
-  int getArmPosition() const { return armPosition; }
-  
-private:
   void handleRoot();
   void handleControl();
-  void handleSensors();
-  
-  static const char webpage[];
 };
 
 #endif
