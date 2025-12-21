@@ -14,11 +14,13 @@ WebInterface webInterface;
 // ===== Timers =====
 unsigned long lastMotorUpdate = 0;
 unsigned long lastSensorUpdate = 0;
+unsigned long lastAutoStopCheck = 0; 
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
-Serial.println("Hello ESP"); 
+  Serial.println("Hello ESP"); 
+  
   WiFi.mode(WIFI_AP);
   WiFi.softAP("brainless", "12345678");
 
@@ -32,6 +34,9 @@ Serial.println("Hello ESP");
 
   lastMotorUpdate = millis();
   lastSensorUpdate = millis();
+  lastAutoStopCheck = millis();  
+  
+  Serial.println("Auto-Stop Safety Feature Enabled");
 }
 
 
@@ -46,6 +51,22 @@ void loop() {
     sensors.updateIMU();
     sensors.updateDistance();
     lastSensorUpdate = now;
+  }
+
+  //Auto-Stop Safety Check
+  if (ENABLE_AUTO_STOP && (now - lastAutoStopCheck >= AUTO_STOP_CHECK_INTERVAL)) {
+    float distance = sensors.getDistance();
+    
+   //if the distance is less than the auto-stop threshold, engage auto-stop
+    if(distance < AUTO_STOP_DISTANCE && distance > 0) {
+      motors.autoStop();
+    }
+  //if the distance is safely above the threshold, resume normal operation
+    else if(distance > (AUTO_STOP_DISTANCE + 5)) {
+      motors.resume();
+    }
+    
+    lastAutoStopCheck = now;
   }
 
   // Update Motors

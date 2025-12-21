@@ -7,7 +7,8 @@ MotorControl::MotorControl()
     rightPID(MOTOR_PID_KP, MOTOR_PID_KI, MOTOR_PID_KD),
     leftFilter(SPEED_FILTER_Q, SPEED_FILTER_R),
     rightFilter(SPEED_FILTER_Q, SPEED_FILTER_R),
-    targetSpeed(0), targetTurn(0) {}
+    targetSpeed(0), targetTurn(0), 
+    isAutoStopped(false) {} 
 
 void MotorControl::begin() {
   pinMode(MOTOR_IN1, OUTPUT);
@@ -22,15 +23,32 @@ void MotorControl::begin() {
   ledcAttachPin(MOTOR_ENA, PWM_CHANNEL_LEFT);
   ledcAttachPin(MOTOR_ENB, PWM_CHANNEL_RIGHT);
 
-  Serial.println("✓ Motors initialized");
+  Serial.println("Motors initialized");
 }
 
 void MotorControl::setSpeed(int speed, int turn) {
+  //
+  if(isAutoStopped && speed > 0) {
+    Serial.println("Auto-stop active!");
+    return;
+  }
+  
   targetSpeed = constrain(speed, -MAX_SPEED, MAX_SPEED);
   targetTurn = constrain(turn, -MAX_SPEED, MAX_SPEED);
+  
+
+  if(speed < 0) {
+    isAutoStopped = false;
+  }
 }
 
 void MotorControl::update(float dt) {
+  
+  if(isAutoStopped) {
+    setMotorSpeed(0, 0);
+    return;
+  }
+  
   int leftSpeed = targetSpeed + targetTurn;
   int rightSpeed = targetSpeed - targetTurn;
 
@@ -62,4 +80,22 @@ void MotorControl::setMotorSpeed(int leftSpeed, int rightSpeed) {
 void MotorControl::stop() {
   setSpeed(0, 0);
   update(0.02);
+}
+
+void MotorControl::autoStop() {
+  if(!isAutoStopped) {
+    isAutoStopped = true;
+    targetSpeed = 0;
+    targetTurn = 0;
+    setMotorSpeed(0, 0);
+    Serial.println("AUTO-STOP: Engaged, motors stopped");
+  }
+}
+
+
+void MotorControl::resume() {
+  if(isAutoStopped) {
+    isAutoStopped = false;
+    Serial.println("AUTO-STOP: Released, safe to move");
+  }
 }

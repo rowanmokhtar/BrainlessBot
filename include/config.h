@@ -67,4 +67,9 @@
 #define MAX_DISTANCE 400  // Maximum measurable distance in cm
 #define WARNING_DISTANCE 15  // Show warning below this distance
 
+// ===== Auto-Stop Safety Settings ===== 
+#define ENABLE_AUTO_STOP true        // Set to false to disable auto-stop
+#define AUTO_STOP_DISTANCE 10.0      // Distance in cm to trigger auto-stop
+#define AUTO_STOP_CHECK_INTERVAL 50  // Check every 50ms
+
 #endif

@@ -17,6 +17,7 @@ private:
 
   void handleRoot();
   void handleControl();
+  void handleSensorData();
 };
 
 #endif
