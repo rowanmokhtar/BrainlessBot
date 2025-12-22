@@ -21,7 +21,7 @@ bool MPU6050Sensor::begin() {
   mpu.setGyroRange(MPU6050_RANGE_500_DEG);
   mpu.setFilterBandwidth(MPU6050_BAND_21_HZ);
   
-  Serial.println("✓ MPU6050 initialized");
+  Serial.println("MPU6050 initialized");
   
   // Initial calibration
   delay(100);
@@ -32,7 +32,7 @@ bool MPU6050Sensor::begin() {
 }
 
 void MPU6050Sensor::calibrate() {
-  Serial.println("🔄 Calibrating MPU6050... Keep robot still!");
+  Serial.println("Calibrating MPU6050... Keep robot still!");
   
   float pitchSum = 0, rollSum = 0;
   const int samples = 100;
@@ -51,7 +51,7 @@ void MPU6050Sensor::calibrate() {
   compPitch = pitchSum / samples;
   compRoll = rollSum / samples;
   
-  Serial.println("✓ MPU6050 calibrated");
+  Serial.println("MPU6050 calibrated");
   Serial.println("  Initial Pitch: " + String(compPitch, 2) + "°");
   Serial.println("  Initial Roll: " + String(compRoll, 2) + "°");
 }

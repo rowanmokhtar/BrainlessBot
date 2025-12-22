@@ -29,7 +29,7 @@ void IRAM_ATTR Encoder::isrA_Right() {
 }
 
 void Encoder::handleInterrupt() {
-  // Read both channels
+
   bool a = digitalRead(pinA);
   bool b = digitalRead(pinB);
   

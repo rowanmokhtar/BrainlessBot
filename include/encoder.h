@@ -1,7 +1,7 @@
 #ifndef ENCODER_H
 #define ENCODER_H
 
-#include <Arduino.h>  // ⭐ مهم جداً!
+#include <Arduino.h>  
 
 class Encoder {
 private:
@@ -13,7 +13,7 @@ private:
   float velocity;
   float distance;
 
-public:  // ⭐ حول الـ ISR functions لـ public
+public:  
   static void IRAM_ATTR isrA_Left();
   static void IRAM_ATTR isrA_Right();
   

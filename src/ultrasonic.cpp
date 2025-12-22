@@ -8,7 +8,7 @@ UltrasonicSensor::UltrasonicSensor()
 void UltrasonicSensor::begin() {
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
-  Serial.println("✓ Ultrasonic sensor initialized");
+  Serial.println("Ultrasonic sensor initialized");
 }
 
 float UltrasonicSensor::readRawDistance() {

@@ -5,19 +5,19 @@
 #define AP_SSID        "brainless"
 #define AP_PASSWORD    "12345678"
 
-// Motor Pins (L298N H-Bridge)
-#define MOTOR_LEFT_PWM   5    // ENA - Left motor PWM
-#define MOTOR_LEFT_IN1   18   // IN1 - Left motor direction 1
-#define MOTOR_LEFT_IN2   19   // IN2 - Left motor direction 2
-#define MOTOR_RIGHT_PWM  4    // ENB - Right motor PWM
-#define MOTOR_RIGHT_IN3  22   // IN3 - Right motor direction 1
-#define MOTOR_RIGHT_IN4  23   // IN4 - Right motor direction 2
+// Motor Pins 
+#define MOTOR_LEFT_PWM   5    // ENA 
+#define MOTOR_LEFT_IN1   18   // IN1 
+#define MOTOR_LEFT_IN2   19   // IN2 
+#define MOTOR_RIGHT_PWM  4    // ENB 
+#define MOTOR_RIGHT_IN3  22   // IN3
+#define MOTOR_RIGHT_IN4  23   // IN4 
 
-// Encoder Pins (Quadrature Encoders)
-#define ENCODER_LEFT_A   34   // Left encoder channel A
-#define ENCODER_LEFT_B   35   // Left encoder channel B
-#define ENCODER_RIGHT_A  32   // Right encoder channel A
-#define ENCODER_RIGHT_B  33   // Right encoder channel B
+// Encoder Pins 
+#define ENCODER_LEFT_A   34   //  R channel A
+#define ENCODER_LEFT_B   35   //  L channel B
+#define ENCODER_RIGHT_A  32   // R channel A
+#define ENCODER_RIGHT_B  33   // L channel B
 
 // MPU6050 I2C Pins
 #define MPU_SDA_PIN  26
@@ -31,27 +31,27 @@
 #define ECHO_PIN 12
 
 // PWM Settings
-#define PWM_FREQ 20000        // 20kHz for smooth motor control
+#define PWM_FREQ 20000        // 20kHz
 #define PWM_RES 8             // 8-bit resolution (0-255)
 #define PWM_CHANNEL_LEFT 0
 #define PWM_CHANNEL_RIGHT 1
 
 // Motor Speeds
 #define MAX_SPEED 255
-#define FORWARD_SPEED 180     // Target speed for forward movement
-#define TURN_SPEED 120        // Target speed for turning
+#define FORWARD_SPEED 200   // Target speed for forward movement
+#define TURN_SPEED 150       // Target speed for turning
 
 // Encoder Settings
-#define ENCODER_PPR 360       // Pulses per revolution (adjust for your encoder)
-#define WHEEL_DIAMETER 0.065  // Wheel diameter in meters (65mm)
-#define WHEEL_BASE 0.15       // Distance between wheels in meters (150mm)
+#define ENCODER_PPR 280      // Pulses per revolution
+#define WHEEL_DIAMETER 0.065  //65mm
+#define WHEEL_BASE 0.16     // Distance between wheels in meters (160mm)
 
 // PID Parameters for Motor Speed Control (Closed Loop)
 #define MOTOR_KP 2.5
 #define MOTOR_KI 0.8
 #define MOTOR_KD 0.15
 
-// PID Parameters for Balance Control (if using MPU for balance)
+// PID Parameters for Balance Control 
 #define BALANCE_KP 15.0
 #define BALANCE_KI 0.5
 #define BALANCE_KD 1.2
@@ -71,11 +71,11 @@
 #define SERVO_MIN 0
 #define SERVO_MAX 180
 #define SERVO_INITIAL 90
-#define SERVO_STEP 30
+#define SERVO_STEP 60
 
 // Safety Settings
 #define STOP_DISTANCE 15.0
-#define RESUME_DISTANCE 20.0
+#define RESUME_DISTANCE 30.0
 #define CHECK_INTERVAL 50
 
 // Update Intervals (ms)

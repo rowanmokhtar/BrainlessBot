@@ -28,7 +28,7 @@ void MotorControl::begin(Encoder* leftEnc, Encoder* rightEnc) {
   ledcAttachPin(MOTOR_LEFT_PWM, PWM_CHANNEL_LEFT);
   ledcAttachPin(MOTOR_RIGHT_PWM, PWM_CHANNEL_RIGHT);
   
-  Serial.println("✓ Motor control initialized (H-Bridge with PID + Encoders)");
+  Serial.println("Motor control initialized (H-Bridge with PID + Encoders)");
 }
 
 void MotorControl::setMotorPWM(int left, int right) {
@@ -60,7 +60,7 @@ void MotorControl::setMotorPWM(int left, int right) {
   ledcWrite(PWM_CHANNEL_LEFT, abs(left));
   ledcWrite(PWM_CHANNEL_RIGHT, abs(right));
 }
-
+// PID calculation
 float MotorControl::calculatePID(float target, float current, float &error, float &integral, float &prevError, float dt) {
   error = target - current;
   integral += error * dt;
@@ -81,7 +81,7 @@ float MotorControl::calculatePID(float target, float current, float &error, floa
   
   return output;
 }
-
+// Odometry update
 void MotorControl::updateOdometry(float dt) {
   if (!leftEncoder || !rightEncoder) return;
   
@@ -115,7 +115,7 @@ void MotorControl::update(float dt) {
   float filteredLeft = leftSpeedFilter.update(leftVelocity);
   float filteredRight = rightSpeedFilter.update(rightVelocity);
   
-  // Calculate PID outputs
+  // Calculate PID outputs 
   float leftPWM = calculatePID(targetLeftSpeed, filteredLeft, leftError, leftIntegral, leftPrevError, dt);
   float rightPWM = calculatePID(targetRightSpeed, filteredRight, rightError, rightIntegral, rightPrevError, dt);
   
@@ -137,12 +137,12 @@ void MotorControl::stop() {
   rightIntegral = 0;
   rightPrevError = 0;
   
-  Serial.println("→ STOP");
+  Serial.println("STOP");
 }
 
 void MotorControl::setTargetSpeed(float left, float right) {
   if (autoStopped && (left > 0 || right > 0)) {
-    Serial.println("⚠️ Cannot move forward - obstacle detected!");
+    Serial.println("Cannot move forward - obstacle detected!");
     return;
   }
   
@@ -156,29 +156,29 @@ void MotorControl::setTargetSpeed(float left, float right) {
 
 void MotorControl::moveForward(float speed) {
   setTargetSpeed(speed, speed);
-  Serial.println("→ FORWARD at " + String(speed, 2) + " m/s");
+  Serial.println("FORWARD at " + String(speed, 2) + " m/s");
 }
 
 void MotorControl::moveBackward(float speed) {
   setTargetSpeed(-speed, -speed);
-  Serial.println("→ BACKWARD at " + String(speed, 2) + " m/s");
+  Serial.println("BACKWARD at " + String(speed, 2) + " m/s");
 }
 
 void MotorControl::turnLeft(float speed) {
   setTargetSpeed(-speed, speed);
-  Serial.println("→ LEFT at " + String(speed, 2) + " m/s");
+  Serial.println("LEFT at " + String(speed, 2) + " m/s");
 }
 
 void MotorControl::turnRight(float speed) {
   setTargetSpeed(speed, -speed);
-  Serial.println("→ RIGHT at " + String(speed, 2) + " m/s");
+  Serial.println("RIGHT at " + String(speed, 2) + " m/s");
 }
 
 void MotorControl::setAutoStop(bool stopped) {
   if (stopped && !autoStopped) {
-    Serial.println("🛑 AUTO-STOP ACTIVATED");
+    Serial.println("AUTO-STOP ACTIVATED");
   } else if (!stopped && autoStopped) {
-    Serial.println("✅ AUTO-STOP RELEASED");
+    Serial.println("AUTO-STOP RELEASED");
   }
   autoStopped = stopped;
 }
@@ -214,5 +214,5 @@ void MotorControl::resetOdometry() {
   if (leftEncoder) leftEncoder->reset();
   if (rightEncoder) rightEncoder->reset();
   
-  Serial.println("📍 Odometry reset");
+  Serial.println("Odometry reset");
 }
