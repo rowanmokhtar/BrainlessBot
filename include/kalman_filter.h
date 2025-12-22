@@ -3,11 +3,11 @@
 
 class KalmanFilter {
 private:
-  float q;  // process noise covariance
-  float r;  // measurement noise covariance
-  float x;  // estimated value
-  float p;  // estimation error covariance
-  float k;  // kalman gain
+  float q;  // Process noise covariance
+  float r;  // Measurement noise covariance
+  float x;  // Estimated value
+  float p;  // Estimation error covariance
+  float k;  // Kalman gain
 
 public:
   KalmanFilter(float processNoise, float measurementNoise);

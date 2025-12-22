@@ -1,75 +1,92 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-
-// ===== Access Point Settings =====
+// WiFi Settings
 #define AP_SSID        "brainless"
 #define AP_PASSWORD    "12345678"
 
+// Motor Pins (L298N H-Bridge)
+#define MOTOR_LEFT_PWM   5    // ENA - Left motor PWM
+#define MOTOR_LEFT_IN1   18   // IN1 - Left motor direction 1
+#define MOTOR_LEFT_IN2   19   // IN2 - Left motor direction 2
+#define MOTOR_RIGHT_PWM  4    // ENB - Right motor PWM
+#define MOTOR_RIGHT_IN3  22   // IN3 - Right motor direction 1
+#define MOTOR_RIGHT_IN4  23   // IN4 - Right motor direction 2
 
-// ===== L298N Motor Driver Pins =====
-#define MOTOR_ENA 5
-#define MOTOR_IN1 18
-#define MOTOR_IN2 19
-#define MOTOR_ENB 4
-#define MOTOR_IN3 22
-#define MOTOR_IN4 23
+// Encoder Pins (Quadrature Encoders)
+#define ENCODER_LEFT_A   34   // Left encoder channel A
+#define ENCODER_LEFT_B   35   // Left encoder channel B
+#define ENCODER_RIGHT_A  32   // Right encoder channel A
+#define ENCODER_RIGHT_B  33   // Right encoder channel B
 
-// ===== Servo Pin =====
+// MPU6050 I2C Pins
+#define MPU_SDA_PIN  26
+#define MPU_SCL_PIN  27
+
+// Servo Pin
 #define SERVO_PIN 21
 
-// ===== Ultrasonic Sensor Pins =====
+// Ultrasonic Pins
 #define TRIG_PIN 13
 #define ECHO_PIN 12
 
-// ===== MPU6050 I2C Pins =====
-#define SDA_PIN 26
-#define SCL_PIN 27
-
-// ===== PWM Settings =====
-#define PWM_FREQ 5000
-#define PWM_RES 8
+// PWM Settings
+#define PWM_FREQ 20000        // 20kHz for smooth motor control
+#define PWM_RES 8             // 8-bit resolution (0-255)
 #define PWM_CHANNEL_LEFT 0
 #define PWM_CHANNEL_RIGHT 1
 
-// ===== Motor Speed Settings =====
+// Motor Speeds
 #define MAX_SPEED 255
-#define DEFAULT_SPEED 200
-#define DEFAULT_TURN_SPEED 150
+#define FORWARD_SPEED 180     // Target speed for forward movement
+#define TURN_SPEED 120        // Target speed for turning
 
-// ===== PID Parameters =====
-#define MOTOR_PID_KP 2.0
-#define MOTOR_PID_KI 0.5
-#define MOTOR_PID_KD 0.1
+// Encoder Settings
+#define ENCODER_PPR 360       // Pulses per revolution (adjust for your encoder)
+#define WHEEL_DIAMETER 0.065  // Wheel diameter in meters (65mm)
+#define WHEEL_BASE 0.15       // Distance between wheels in meters (150mm)
 
-#define BALANCE_PID_KP 3.0
-#define BALANCE_PID_KI 0.8
-#define BALANCE_PID_KD 0.2
+// PID Parameters for Motor Speed Control (Closed Loop)
+#define MOTOR_KP 2.5
+#define MOTOR_KI 0.8
+#define MOTOR_KD 0.15
 
-// ===== Kalman Filter Parameters =====
-#define SPEED_FILTER_Q 0.1
-#define SPEED_FILTER_R 0.5
+// PID Parameters for Balance Control (if using MPU for balance)
+#define BALANCE_KP 15.0
+#define BALANCE_KI 0.5
+#define BALANCE_KD 1.2
 
-#define ANGLE_FILTER_Q 0.01
-#define ANGLE_FILTER_R 0.1
+// Kalman Filter Parameters
+#define DISTANCE_Q 0.1        // Process noise for distance
+#define DISTANCE_R 5.0        // Measurement noise for distance
+#define SPEED_Q 0.01          // Process noise for motor speed
+#define SPEED_R 0.1           // Measurement noise for motor speed
+#define ANGLE_Q 0.001         // Process noise for angle (MPU)
+#define ANGLE_R 0.03          // Measurement noise for angle (MPU)
 
-// ===== Servo Settings =====
+// Complementary Filter for MPU
+#define COMPLEMENTARY_ALPHA 0.98  // 98% gyro, 2% accelerometer
+
+// Servo Settings
 #define SERVO_MIN 0
 #define SERVO_MAX 180
 #define SERVO_INITIAL 90
-#define SERVO_STEP 10
+#define SERVO_STEP 30
 
-// ===== Sensor Update Rates =====
-#define SENSOR_UPDATE_RATE 20  // 50Hz (20ms)
-#define MOTOR_UPDATE_RATE 20   // 50Hz (20ms)
+// Safety Settings
+#define STOP_DISTANCE 15.0
+#define RESUME_DISTANCE 20.0
+#define CHECK_INTERVAL 50
 
-// ===== Distance Sensor Settings =====
-#define MAX_DISTANCE 400  // Maximum measurable distance in cm
-#define WARNING_DISTANCE 15  // Show warning below this distance
+// Update Intervals (ms)
+#define PID_UPDATE_INTERVAL 10     // 100Hz for motor PID
+#define MPU_UPDATE_INTERVAL 10     // 100Hz for IMU
+#define ENCODER_UPDATE_INTERVAL 20 // 50Hz for encoder readings
+#define DISTANCE_CHECK_INTERVAL 50 // 20Hz for ultrasonic
+#define WEB_UPDATE_INTERVAL 100    // 10Hz for web updates
 
-// ===== Auto-Stop Safety Settings ===== 
-#define ENABLE_AUTO_STOP true        // Set to false to disable auto-stop
-#define AUTO_STOP_DISTANCE 10.0      // Distance in cm to trigger auto-stop
-#define AUTO_STOP_CHECK_INTERVAL 50  // Check every 50ms
+// Motion Tracking
+#define ENABLE_ODOMETRY true
+#define ENABLE_MOTION_TRACKING true
 
 #endif

@@ -2,22 +2,33 @@
 #define WEB_INTERFACE_H
 
 #include <WebServer.h>
-#include <ESP32Servo.h>
+
+// Forward declarations
+class MotorControl;
+class UltrasonicSensor;
+class ServoControl;
+class MPU6050Sensor;
+class Encoder;
 
 class WebInterface {
-public:
-  WebInterface();
-  void begin();
-  void handleClient();
-
 private:
   WebServer server;
-  Servo armServo;
-  int armPosition;
-
+  MotorControl* motors;
+  UltrasonicSensor* sensor;
+  ServoControl* servo;
+  MPU6050Sensor* imu;
+  Encoder* leftEnc;
+  Encoder* rightEnc;
+  
   void handleRoot();
-  void handleControl();
-  void handleSensorData();
+  void handleCommand();
+  void handleData();
+
+public:
+  WebInterface();
+  void begin(MotorControl* m, UltrasonicSensor* s, ServoControl* srv, 
+             MPU6050Sensor* imu, Encoder* left, Encoder* right);
+  void handleClient();
 };
 
 #endif
