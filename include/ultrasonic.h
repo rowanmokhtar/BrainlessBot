@@ -13,8 +13,9 @@ private:
 public:
   UltrasonicSensor();
   void begin();
-  float getDistance();
-  float getFilteredDistance();
+  float getDistance();          // Returns filtered distance with averaging
+  float getFilteredDistance();  // Returns last filtered value
+  float getRawDistance();        // Returns single raw reading (for debugging)
 };
 
 #endif

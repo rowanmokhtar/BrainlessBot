@@ -15,6 +15,7 @@ public:
   void moveDown();
   void setPosition(int pos);
   int getPosition() const;
+  
 };
 
 #endif

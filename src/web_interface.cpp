@@ -6,6 +6,7 @@
 #include "Encoder.h"
 #include "config.h"
 #include <Arduino.h>
+
 const char webpage[] PROGMEM = R"=====(
 <!DOCTYPE html>
 <html>
@@ -14,9 +15,10 @@ const char webpage[] PROGMEM = R"=====(
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:Arial,sans-serif;background:linear-gradient(135deg,#1e3a8a 0%,#7e22ce 100%);color:#fff;padding:15px}
-.container{max-width:900px;margin:0 auto}
-.card{background:rgba(171, 14, 14, 0.1);backdrop-filter:blur(10px);border-radius:15px;padding:20px;margin:15px 0;border:1px solid rgba(255,255,255,0.2)}
+.container{max-width:1200px;margin:0 auto}
+.card{background:rgba(171,14,14,0.1);backdrop-filter:blur(10px);border-radius:15px;padding:20px;margin:15px 0;border:1px solid rgba(255,255,255,0.2)}
 h1{font-size:2em;text-align:center;margin-bottom:20px}
+h2{font-size:1.3em;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.3);padding-bottom:5px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:15px}
 .sensor-value{font-size:2.5em;font-weight:bold;text-align:center;margin:10px 0}
 .safe{color:#4ade80}
@@ -25,8 +27,8 @@ h1{font-size:2em;text-align:center;margin-bottom:20px}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 .label{font-size:0.9em;opacity:0.8;text-align:center}
 .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}
-button{background:rgba(173,14,14,0.3);border:2px solid rgba(173, 14, 14, 0.3);color:#fff;padding:15px;font-size:1em;border-radius:10px;cursor:pointer;transition:all 0.2s;font-weight:bold}
-button:hover{background:rgba(173, 14, 14, 0.3);transform:scale(1.05)}
+button{background:rgba(173,14,14,0.3);border:2px solid rgba(173,14,14,0.3);color:#fff;padding:15px;font-size:1em;border-radius:10px;cursor:pointer;transition:all 0.2s;font-weight:bold}
+button:hover{background:rgba(173,14,14,0.5);transform:scale(1.05)}
 button:active{transform:scale(0.95)}
 .btn-forward{grid-column:2}
 .btn-left{grid-column:1;grid-row:2}
@@ -36,25 +38,28 @@ button:active{transform:scale(0.95)}
 .servo-controls{display:flex;gap:10px}
 .servo-controls button{flex:1}
 .data-row{display:flex;justify-content:space-between;padding:8px;background:rgba(0,0,0,0.2);border-radius:8px;margin:5px 0}
-.badge{display:inline-block;background:rgba(64, 17, 17, 0.28);border:1px solid #8b3236ff;padding:3px 10px;border-radius:10px;font-size:0.75em;margin:5px 0}
+.badge{display:inline-block;padding:3px 10px;border-radius:10px;font-size:0.75em;margin:5px 0}
+.badge-active{background:rgba(239,68,68,0.3);border:1px solid #ef4444}
+.badge-clear{background:rgba(74,222,128,0.3);border:1px solid #4ade80}
+.badge-info{background:rgba(64,17,17,0.28);border:1px solid #8b3236ff}
 </style>
 </head>
 <body>
 <div class="container">
-<h1>No brain ,Just kick</h1>
+<h1>No brain, Just kick</h1>
 <div class="grid">
 <div class="card">
-<h2>Distance</h2>
+<h2> Distance</h2>
 <div class="sensor-value safe" id="distance">--</div>
 <div class="label">Kalman Filtered</div>
-<div class="badge">✓ Auto-Stop Active</div>
+<div id="autoStopBadge" class="badge badge-clear">Path Clear</div>
 </div>
 <div class="card">
-<h2>IMU (MPU6050)</h2>
+<h2>IMU</h2>
 <div class="data-row"><span>Pitch:</span><span id="pitch">--°</span></div>
 <div class="data-row"><span>Roll:</span><span id="roll">--°</span></div>
 <div class="data-row"><span>Yaw:</span><span id="yaw">--°</span></div>
-<div class="badge">Sensor Fusion</div>
+<div class="badge badge-info">Sensor Fusion</div>
 </div>
 </div>
 <div class="card">
@@ -70,27 +75,27 @@ button:active{transform:scale(0.95)}
 <div class="data-row"><span>Heading:</span><span id="heading">--°</span></div>
 </div>
 </div>
-<div class="badge"> Motion Tracking</div>
+<div class="badge badge-info">Motion Tracking</div>
 </div>
 <div class="card">
 <h2>Controls</h2>
 <div class="controls">
-<button class="btn-forward" onclick="cmd('w')"><br>FORWARD</button>
-<button class="btn-left" onclick="cmd('a')"><br>LEFT</button>
-<button class="btn-backward" onclick="cmd('s')"><br>BACK</button>
-<button class="btn-right" onclick="cmd('d')"><br>RIGHT</button>
+<button class="btn-forward" onclick="cmd('w')">⬆<br>FORWARD</button>
+<button class="btn-left" onclick="cmd('a')">⬅<br>LEFT</button>
+<button class="btn-backward" onclick="cmd('s')">⬇<br>BACK</button>
+<button class="btn-right" onclick="cmd('d')">➡<br>RIGHT</button>
 </div>
 <div class="servo-controls">
-<button onclick="cmd('o')"> ARM UP</button>
-<button onclick="cmd('p')"> ARM DOWN</button>
+<button onclick="cmd('o')">ARM UP</button>
+<button onclick="cmd('p')">ARM DOWN</button>
 </div>
 <button class="btn-stop" onclick="cmd('q')">STOP</button>
-<button onclick="cmd('r')" style="margin-top:10px;grid-column:1/4">Reset Odometry</button>
+<button onclick="cmd('r')" style="margin-top:10px">Reset Odometry</button>
 </div>
 </div>
 <script>
 function cmd(c){fetch('/cmd?c='+c).catch(e=>console.error(e))}
-function update(){
+function updateData(){
 fetch('/data').then(r=>r.json()).then(d=>{
 document.getElementById('distance').textContent=d.dist.toFixed(1)+' cm';
 document.getElementById('pitch').textContent=d.pitch.toFixed(1)+'°';
@@ -105,8 +110,17 @@ let distEl=document.getElementById('distance');
 if(d.dist<15){distEl.className='sensor-value danger'}
 else if(d.dist<30){distEl.className='sensor-value warning'}
 else{distEl.className='sensor-value safe'}
+let badge=document.getElementById('autoStopBadge');
+if(d.stopped){
+badge.textContent='Auto-Stop Active';
+badge.className='badge badge-active';
+}else{
+badge.textContent='Path Clear';
+badge.className='badge badge-clear';
+}
 }).catch(e=>console.error(e))}
-setInterval(update,100);update();
+setInterval(updateData,100);
+updateData();
 document.addEventListener('keydown',e=>{
 const keys={'w':'w','W':'w','ArrowUp':'w','s':'s','S':'s','ArrowDown':'s',
 'a':'a','A':'a','ArrowLeft':'a','d':'d','D':'d','ArrowRight':'d',
@@ -133,7 +147,7 @@ void WebInterface::begin(MotorControl* m, UltrasonicSensor* s, ServoControl* srv
   server.on("/data", [this]() { handleData(); });
   
   server.begin();
-  Serial.println("✓ Web server started");
+  Serial.println("Web server started");
 }
 
 void WebInterface::handleRoot() {
@@ -147,18 +161,32 @@ void WebInterface::handleCommand() {
   }
   
   String c = server.arg("c");
+  float speedMS = 0.6;  
   
-  // Convert PWM speeds to m/s 
-  float speedMS = 0.3; 
-  
-  if (c == "w") motors->moveForward(speedMS);
-  else if (c == "s") motors->moveBackward(speedMS);
-  else if (c == "a") motors->turnLeft(speedMS * 0.7);
-  else if (c == "d") motors->turnRight(speedMS * 0.7);
-  else if (c == "q") motors->stop();
-  else if (c == "o") servo->moveUp();
-  else if (c == "p") servo->moveDown();
-  else if (c == "r") motors->resetOdometry();
+  if (c == "w") {
+    motors->moveForward(speedMS);
+  }
+  else if (c == "s") {
+    motors->moveBackward(speedMS);
+  }
+  else if (c == "a") {
+    motors->turnLeft(speedMS);  // Removed the 0.7 multiplier
+  }
+  else if (c == "d") {
+    motors->turnRight(speedMS);  // Removed the 0.7 multiplier
+  }
+  else if (c == "q") {
+    motors->stop();
+  }
+  else if (c == "o") {
+    servo->moveUp();
+  }
+  else if (c == "p") {
+    servo->moveDown();
+  }
+  else if (c == "r") {
+    motors->resetOdometry();
+  }
   
   server.send(200, "text/plain", "OK");
 }

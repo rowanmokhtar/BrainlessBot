@@ -22,101 +22,96 @@ WebInterface webInterface;
 // Timing variables
 unsigned long lastPIDUpdate = 0;
 unsigned long lastMPUUpdate = 0;
-unsigned long lastEncoderUpdate = 0;
 unsigned long lastDistanceCheck = 0;
 
 void setup() {
   Serial.begin(115200);
   delay(1000);
   
-  Serial.println("\n╔════════════════════════════════╗");
-  Serial.println("║   🤖 ADVANCED ROBOT SYSTEM 🤖  ║");
-  Serial.println("╚════════════════════════════════╝");
+  // setup Servo
+  servoArm.begin();
+  delay(500);
   
-  // Setup WiFi Access Point
+  // wifi setup
+  
   WiFi.mode(WIFI_AP);
   WiFi.softAP(AP_SSID, AP_PASSWORD);
-  Serial.println("\n✓ WiFi AP Started");
-  Serial.print("📡 SSID: ");
-  Serial.println(AP_SSID);
-  Serial.print("🌐 IP Address: ");
-  Serial.println(WiFi.softAPIP());
+  delay(500);
   
-  // Initialize IMU (MPU6050)
-  Serial.println("\n⚙️ Initializing sensors...");
-  if (!imu.begin()) {
-    Serial.println("✗ Failed to initialize MPU6050!");
-    Serial.println("⚠️ Check I2C connections (SDA=26, SCL=27)");
-  }
+  // motor setup
+  motors.begin(&leftEncoder, &rightEncoder);
+  delay(100);
   
-  // Initialize encoders with interrupts
-  Encoder::leftEncoder = &leftEncoder;
-  Encoder::rightEncoder = &rightEncoder;
+  // encoder setup
   leftEncoder.begin();
   rightEncoder.begin();
-  attachInterrupt(digitalPinToInterrupt(ENCODER_LEFT_A), Encoder::isrA_Left, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(ENCODER_RIGHT_A), Encoder::isrA_Right, CHANGE);
-  Serial.println("✓ Encoders initialized with interrupts");
   
-  // Initialize other components
-  motors.begin(&leftEncoder, &rightEncoder);
+  // imu setup
+  
+  if (!imu.begin()) {
+    Serial.println("imu failed");
+  } else {
+    Serial.println("imu ready");
+  }
+  delay(100);
+  
+  // ultrasonic setup
   ultrasonic.begin();
-  servoArm.begin();
+  
+  // web server setup
+
   webInterface.begin(&motors, &ultrasonic, &servoArm, &imu, &leftEncoder, &rightEncoder);
   
-  // Print system features
-  Serial.println("\n🎯 Advanced Features Enabled:");
-  Serial.println("  ✓ MPU6050 Sensor Fusion (Complementary + Kalman)");
-  Serial.println("  ✓ Encoder Feedback (Quadrature)");
-  Serial.println("  ✓ PID Closed-Loop Motor Control");
-  Serial.println("  ✓ H-Bridge Motor Driving (L298N)");
-  Serial.println("  ✓ Motion Tracking & Odometry");
-  Serial.println("  ✓ Kalman Filters (Distance + Speed + Angles)");
-  Serial.println("  ✓ Auto-Stop Safety System");
+  // Print system info
+  Serial.println("\n📊 System Configuration:");
+  Serial.println("  Encoder Mode: POLLING (no interrupts)");
+  Serial.println("  Left:  GPIO" + String(ENCODER_LEFT_A) + "/" + String(ENCODER_LEFT_B));
+  Serial.println("  Right: GPIO" + String(ENCODER_RIGHT_A) + "/" + String(ENCODER_RIGHT_B));
+  Serial.println("  Servo: GPIO" + String(SERVO_PIN));
+  Serial.println("  Motor PWM: " + String(PWM_FREQ) + "Hz");
   
-  // Print configuration
-  Serial.println("\n⚙️ Configuration:");
-  Serial.println("  PID: Kp=" + String(MOTOR_KP) + ", Ki=" + String(MOTOR_KI) + ", Kd=" + String(MOTOR_KD));
-  Serial.println("  Distance Filter: Q=" + String(DISTANCE_Q) + ", R=" + String(DISTANCE_R));
-  Serial.println("  Speed Filter: Q=" + String(SPEED_Q) + ", R=" + String(SPEED_R));
-  Serial.println("  Angle Filter: Q=" + String(ANGLE_Q) + ", R=" + String(ANGLE_R));
+  // Print features
+  Serial.println("\n🎯 System Features:");
+  Serial.println("  ✓ MPU6050 Sensor Fusion");
+  Serial.println("  ✓ Encoder Feedback (Polling)");
+  Serial.println("  ✓ PID Motor Control");
+  Serial.println("  ✓ H-Bridge Driving");
+  Serial.println("  ✓ Kalman Filtering");
+  Serial.println("  ✓ Auto-Stop Safety");
+  Serial.println("  ✓ Web Console Logging");
   
-  Serial.println("\n🚀 System Ready!");
-  Serial.println("⚠️ Auto-stop at " + String(STOP_DISTANCE) + "cm ENABLED");
-  Serial.println("\n📱 Connect to WiFi and open: http://" + WiFi.softAPIP().toString());
+  Serial.println("\n🚀 SYSTEM READY!");
+  Serial.println("📱 Connect to: " + String(AP_SSID));
+  Serial.println("🌐 Open: http://" + WiFi.softAPIP().toString());
   Serial.println("════════════════════════════════════\n");
   
   // Initialize timing
   lastPIDUpdate = millis();
   lastMPUUpdate = millis();
-  lastEncoderUpdate = millis();
   lastDistanceCheck = millis();
 }
 
 void loop() {
   unsigned long now = millis();
   
-  // Handle web requests (highest priority)
+  // CRITICAL: Poll encoders as fast as possible for accurate readings
+  leftEncoder.update();
+  rightEncoder.update();
+  
+  // Handle web requests
   webInterface.handleClient();
   
-  // Update MPU6050 (100Hz for smooth sensor fusion)
+  // Update MPU6050
   if (now - lastMPUUpdate >= MPU_UPDATE_INTERVAL) {
     imu.update();
     lastMPUUpdate = now;
   }
   
-  // Update encoders (50Hz)
-  if (now - lastEncoderUpdate >= ENCODER_UPDATE_INTERVAL) {
-    leftEncoder.update();
-    rightEncoder.update();
-    lastEncoderUpdate = now;
-  }
-  
-  // Check distance for auto-stop safety (20Hz)
+  // Check distance for auto-stop
   if (now - lastDistanceCheck >= DISTANCE_CHECK_INTERVAL) {
     float distance = ultrasonic.getDistance();
     
-    // Auto-stop logic with hysteresis
+    // Auto-stop with hysteresis
     if (distance < STOP_DISTANCE) {
       motors.setAutoStop(true);
     } else if (distance > RESUME_DISTANCE) {
@@ -126,13 +121,13 @@ void loop() {
     lastDistanceCheck = now;
   }
   
-  // Update motors with PID control (100Hz for responsive control)
+  // Update motors with PID
   if (now - lastPIDUpdate >= PID_UPDATE_INTERVAL) {
     float dt = (now - lastPIDUpdate) / 1000.0;
     motors.update(dt);
     lastPIDUpdate = now;
   }
   
-  // Small delay to prevent watchdog timer issues
+  // Small delay (encoder polling happens every loop iteration)
   delay(1);
 }

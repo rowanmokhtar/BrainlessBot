@@ -28,7 +28,28 @@ void MotorControl::begin(Encoder* leftEnc, Encoder* rightEnc) {
   ledcAttachPin(MOTOR_LEFT_PWM, PWM_CHANNEL_LEFT);
   ledcAttachPin(MOTOR_RIGHT_PWM, PWM_CHANNEL_RIGHT);
   
-  Serial.println("Motor control initialized (H-Bridge with PID + Encoders)");
+  Serial.println("✓ Motor control initialized");
+  
+  // Test motors
+  testMotors();
+}
+
+void MotorControl::testMotors() {
+  Serial.println("Testing motors...");
+  
+  digitalWrite(MOTOR_LEFT_IN1, HIGH);
+  digitalWrite(MOTOR_LEFT_IN2, LOW);
+  ledcWrite(PWM_CHANNEL_LEFT, 100);
+  delay(300);
+  ledcWrite(PWM_CHANNEL_LEFT, 0);
+  
+  digitalWrite(MOTOR_RIGHT_IN3, HIGH);
+  digitalWrite(MOTOR_RIGHT_IN4, LOW);
+  ledcWrite(PWM_CHANNEL_RIGHT, 100);
+  delay(300);
+  ledcWrite(PWM_CHANNEL_RIGHT, 0);
+  
+  Serial.println("✓ Motors test complete");
 }
 
 void MotorControl::setMotorPWM(int left, int right) {
@@ -60,69 +81,81 @@ void MotorControl::setMotorPWM(int left, int right) {
   ledcWrite(PWM_CHANNEL_LEFT, abs(left));
   ledcWrite(PWM_CHANNEL_RIGHT, abs(right));
 }
-// PID calculation
+
 float MotorControl::calculatePID(float target, float current, float &error, float &integral, float &prevError, float dt) {
   error = target - current;
-  integral += error * dt;
   
-  // Anti-windup
-  float maxIntegral = MAX_SPEED / MOTOR_KI;
-  if (integral > maxIntegral) integral = maxIntegral;
-  if (integral < -maxIntegral) integral = -maxIntegral;
+  if (abs(error) < 0.2) {
+    integral += error * dt;
+  } else {
+    integral = 0;
+  }
+  
+  float maxIntegral = 50.0;
+  integral = constrain(integral, -maxIntegral, maxIntegral);
   
   float derivative = (error - prevError) / dt;
   prevError = error;
   
   float output = MOTOR_KP * error + MOTOR_KI * integral + MOTOR_KD * derivative;
   
-  // Clamp output
-  if (output > MAX_SPEED) output = MAX_SPEED;
-  if (output < -MAX_SPEED) output = -MAX_SPEED;
+  // Feedforward term for faster response
+  output += target * 300.0;  // Increased from 200.0
+  
+  output = constrain(output, -MAX_SPEED, MAX_SPEED);
+  
+  // Reduced deadband compensation for faster start
+  if (abs(output) > 0 && abs(output) < 30) {  // Reduced from 50 to 30
+    output = (output > 0) ? 30 : -30;
+  }
   
   return output;
 }
-// Odometry update
+
 void MotorControl::updateOdometry(float dt) {
   if (!leftEncoder || !rightEncoder) return;
   
-  // Get wheel velocities
   float vLeft = leftEncoder->getVelocity();
   float vRight = rightEncoder->getVelocity();
   
-  // Calculate robot linear and angular velocities
   float vRobot = (vLeft + vRight) / 2.0;
   float omega = (vRight - vLeft) / WHEEL_BASE;
   
-  // Update robot pose
   robotTheta += omega * dt;
   robotX += vRobot * cos(robotTheta) * dt;
   robotY += vRobot * sin(robotTheta) * dt;
 }
 
 void MotorControl::update(float dt) {
-  if (!leftEncoder || !rightEncoder) return;
-  
   if (autoStopped) {
     setMotorPWM(0, 0);
     return;
   }
   
-  // Get encoder feedback (actual velocities)
+  if (targetLeftSpeed == 0 && targetRightSpeed == 0) {
+    setMotorPWM(0, 0);
+    return;
+  }
+  
+  if (!leftEncoder || !rightEncoder) {
+    // Open-loop control
+    int leftPWM = (int)(targetLeftSpeed * 600);
+    int rightPWM = (int)(targetRightSpeed * 600);
+    setMotorPWM(leftPWM, rightPWM);
+    return;
+  }
+  
+  // Closed-loop with encoders
   float leftVelocity = leftEncoder->getVelocity();
   float rightVelocity = rightEncoder->getVelocity();
   
-  // Apply Kalman filters
   float filteredLeft = leftSpeedFilter.update(leftVelocity);
   float filteredRight = rightSpeedFilter.update(rightVelocity);
   
-  // Calculate PID outputs 
   float leftPWM = calculatePID(targetLeftSpeed, filteredLeft, leftError, leftIntegral, leftPrevError, dt);
   float rightPWM = calculatePID(targetRightSpeed, filteredRight, rightError, rightIntegral, rightPrevError, dt);
   
-  // Set motor PWM
   setMotorPWM((int)leftPWM, (int)rightPWM);
-  
-  // Update odometry
   updateOdometry(dt);
 }
 
@@ -131,7 +164,6 @@ void MotorControl::stop() {
   targetRightSpeed = 0;
   setMotorPWM(0, 0);
   
-  // Reset PID
   leftIntegral = 0;
   leftPrevError = 0;
   rightIntegral = 0;
@@ -142,7 +174,7 @@ void MotorControl::stop() {
 
 void MotorControl::setTargetSpeed(float left, float right) {
   if (autoStopped && (left > 0 || right > 0)) {
-    Serial.println("Cannot move forward - obstacle detected!");
+    Serial.println("Cannot move forward - obstacle!");
     return;
   }
   
@@ -165,18 +197,21 @@ void MotorControl::moveBackward(float speed) {
 }
 
 void MotorControl::turnLeft(float speed) {
+  // Left wheel backward, right wheel forward (pivot turn)
   setTargetSpeed(-speed, speed);
-  Serial.println("LEFT at " + String(speed, 2) + " m/s");
+  Serial.println("LEFT TURN at " + String(speed, 2) + " m/s");
 }
 
 void MotorControl::turnRight(float speed) {
+  // Left wheel forward, right wheel backward (pivot turn)
   setTargetSpeed(speed, -speed);
-  Serial.println("RIGHT at " + String(speed, 2) + " m/s");
+  Serial.println("↷ RIGHT TURN at " + String(speed, 2) + " m/s");
 }
 
 void MotorControl::setAutoStop(bool stopped) {
   if (stopped && !autoStopped) {
     Serial.println("AUTO-STOP ACTIVATED");
+    stop();
   } else if (!stopped && autoStopped) {
     Serial.println("AUTO-STOP RELEASED");
   }
@@ -195,6 +230,11 @@ MotorState MotorControl::getState() const {
     state.rightSpeed = rightEncoder->getVelocity();
     state.leftDistance = leftEncoder->getDistance();
     state.rightDistance = rightEncoder->getDistance();
+  } else {
+    state.leftSpeed = 0;
+    state.rightSpeed = 0;
+    state.leftDistance = 0;
+    state.rightDistance = 0;
   }
   
   state.leftPWM = targetLeftSpeed;
@@ -214,5 +254,4 @@ void MotorControl::resetOdometry() {
   if (leftEncoder) leftEncoder->reset();
   if (rightEncoder) rightEncoder->reset();
   
-  Serial.println("Odometry reset");
 }

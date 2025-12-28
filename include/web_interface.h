@@ -2,6 +2,7 @@
 #define WEB_INTERFACE_H
 
 #include <WebServer.h>
+#include <Arduino.h>
 
 // Forward declarations
 class MotorControl;
@@ -9,6 +10,9 @@ class UltrasonicSensor;
 class ServoControl;
 class MPU6050Sensor;
 class Encoder;
+
+// Global logging function - MUST be declared before class
+void webLog(String msg);
 
 class WebInterface {
 private:
@@ -23,6 +27,8 @@ private:
   void handleRoot();
   void handleCommand();
   void handleData();
+  void handleLogs();
+  void handleClearLogs();
 
 public:
   WebInterface();

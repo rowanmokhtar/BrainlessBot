@@ -67,6 +67,7 @@ public:
   
   // Reset odometry
   void resetOdometry();
+   void testMotors();
 };
 
 #endif
