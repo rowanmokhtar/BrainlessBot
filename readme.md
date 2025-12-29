@@ -5,23 +5,29 @@
 BrainlessBot is a modular robotics firmware built using ESP32 and PlatformIO.  
 It combines **IMU-based orientation tracking**, **Kalman filtering**, and **PID motor control** to achieve stable and responsive robot movement, all controlled wirelessly over WiFi.
 
-## ✨ Key Features
-- 📶 WiFi-based remote control
-- 🧭 Real-time IMU orientation (roll, pitch, yaw)
-- 📊 Kalman filter for noise reduction & sensor fusion
-- 🤖 PID control for precise motor movement
-- ⚙️ Modular C++ firmware (PlatformIO + Arduino)
+**What’s inside**
 
-## 🛠️ Tech Stack
-- **ESP32**
-- **C++**
-- **PlatformIO**
-- **Arduino Framework**
-- **WiFi**
-- **Kalman Filter & PID Control**
+📶 WiFi remote control
 
-## 🚀 Getting Started
+🧭 IMU orientation (roll, pitch, yaw)
+
+📊 Kalman filter to calm noisy sensors
+
+🤖 PID motor control
+
+⚙️ Modular C++ code (PlatformIO)
+
+🛠️ Built with
+
+ESP32 &
+C++ &
+PlatformIO &
+Arduino framework &
+WiFi
+
+🚀 **Run it**
 ```bash
 git clone https://github.com/rowanmokhtar/BrainlessBot.git
 cd BrainlessBot
 pio run --target upload
+
