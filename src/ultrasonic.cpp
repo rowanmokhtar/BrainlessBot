@@ -83,12 +83,12 @@ float UltrasonicSensor::getDistance() {
   
   return lastDistance;
 }
-
+// Get the last filtered distance
 float UltrasonicSensor::getFilteredDistance() {
   return lastDistance;
 }
 
-// New function: Get raw distance without filtering
+// Get raw distance without filtering
 float UltrasonicSensor::getRawDistance() {
   return readRawDistance();
 }

@@ -12,7 +12,7 @@ bool MPU6050Sensor::begin() {
   Wire.begin(MPU_SDA_PIN, MPU_SCL_PIN);
   
   if (!mpu.begin()) {
-    Serial.println("✗ MPU6050 not found!");
+    Serial.println("MPU6050 not found!");
     return false;
   }
   
@@ -32,7 +32,7 @@ bool MPU6050Sensor::begin() {
 }
 
 void MPU6050Sensor::calibrate() {
-  Serial.println("Calibrating MPU6050... Keep robot still!");
+  // Take multiple samples to average initial angles
   
   float pitchSum = 0, rollSum = 0;
   const int samples = 100;
@@ -50,10 +50,7 @@ void MPU6050Sensor::calibrate() {
   
   compPitch = pitchSum / samples;
   compRoll = rollSum / samples;
-  
-  Serial.println("MPU6050 calibrated");
-  Serial.println("  Initial Pitch: " + String(compPitch, 2) + "°");
-  Serial.println("  Initial Roll: " + String(compRoll, 2) + "°");
+ 
 }
 
 void MPU6050Sensor::calculateAnglesFromAccel(float &pitch, float &roll) {

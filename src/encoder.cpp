@@ -89,8 +89,8 @@ void Encoder::update() {
   unsigned long currentTime = micros();
   float dt = (currentTime - lastTime) / 1000000.0; // Convert to seconds
   
-  // Update velocity calculation every 50ms (not too fast, not too slow)
-  if (dt >= 0.05) {
+  // Update velocity 
+  if (dt >= 0.05) { // 50ms
     // Calculate distance traveled
     float currentDistance = count / pulsesPerMeter;
     
@@ -110,7 +110,6 @@ void Encoder::reset() {
   velocity = 0;
   lastTime = micros();
   
-  Serial.println("Encoder reset (Pin A: GPIO" + String(pinA) + ")");
 }
 
 long Encoder::getCount() const {

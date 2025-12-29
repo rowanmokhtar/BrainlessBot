@@ -13,7 +13,7 @@
 #define MOTOR_RIGHT_IN3  25  // IN3
 #define MOTOR_RIGHT_IN4  23  // IN4 
 
-// Encoder Pins - POLLING MODE (works with any GPIO including 34, 35)
+// Encoder Pins - POLLING MODE 
 #define ENCODER_LEFT_A   34  // Channel A
 #define ENCODER_LEFT_B   35  // Channel B
 #define ENCODER_RIGHT_A  32  // Channel A
@@ -42,7 +42,7 @@
 #define TURN_SPEED 150
 
 // Encoder Settings
-#define ENCODER_PPR 200 // Pulses per revolution
+#define ENCODER_PPR 200 // PPR 
 #define WHEEL_DIAMETER 0.065
 #define WHEEL_BASE 0.16
 

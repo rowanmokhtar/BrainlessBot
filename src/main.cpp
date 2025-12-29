@@ -61,30 +61,7 @@ void setup() {
   // web server setup
 
   webInterface.begin(&motors, &ultrasonic, &servoArm, &imu, &leftEncoder, &rightEncoder);
-  
-  // Print system info
-  Serial.println("\n📊 System Configuration:");
-  Serial.println("  Encoder Mode: POLLING (no interrupts)");
-  Serial.println("  Left:  GPIO" + String(ENCODER_LEFT_A) + "/" + String(ENCODER_LEFT_B));
-  Serial.println("  Right: GPIO" + String(ENCODER_RIGHT_A) + "/" + String(ENCODER_RIGHT_B));
-  Serial.println("  Servo: GPIO" + String(SERVO_PIN));
-  Serial.println("  Motor PWM: " + String(PWM_FREQ) + "Hz");
-  
-  // Print features
-  Serial.println("\n🎯 System Features:");
-  Serial.println("  ✓ MPU6050 Sensor Fusion");
-  Serial.println("  ✓ Encoder Feedback (Polling)");
-  Serial.println("  ✓ PID Motor Control");
-  Serial.println("  ✓ H-Bridge Driving");
-  Serial.println("  ✓ Kalman Filtering");
-  Serial.println("  ✓ Auto-Stop Safety");
-  Serial.println("  ✓ Web Console Logging");
-  
-  Serial.println("\n🚀 SYSTEM READY!");
-  Serial.println("📱 Connect to: " + String(AP_SSID));
-  Serial.println("🌐 Open: http://" + WiFi.softAPIP().toString());
-  Serial.println("════════════════════════════════════\n");
-  
+ 
   // Initialize timing
   lastPIDUpdate = millis();
   lastMPUUpdate = millis();
@@ -94,7 +71,7 @@ void setup() {
 void loop() {
   unsigned long now = millis();
   
-  // CRITICAL: Poll encoders as fast as possible for accurate readings
+  //  Poll encoders as fast as possible for accurate readings
   leftEncoder.update();
   rightEncoder.update();
   

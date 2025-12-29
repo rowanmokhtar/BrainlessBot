@@ -27,8 +27,8 @@ h2{font-size:1.3em;margin-bottom:10px;border-bottom:1px solid rgba(255,255,255,0
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
 .label{font-size:0.9em;opacity:0.8;text-align:center}
 .controls{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:15px 0}
-button{background:rgba(173,14,14,0.3);border:2px solid rgba(173,14,14,0.3);color:#fff;padding:15px;font-size:1em;border-radius:10px;cursor:pointer;transition:all 0.2s;font-weight:bold}
-button:hover{background:rgba(173,14,14,0.5);transform:scale(1.05)}
+button{background:rgba(71, 33, 152, 0.3);border:2px solid rgba(45, 41, 126, 0.3);color:#fff;padding:15px;font-size:1em;border-radius:10px;cursor:pointer;transition:all 0.2s;font-weight:bold}
+button:hover{background:rgba(59, 48, 164, 0.5);transform:scale(1.05)}
 button:active{transform:scale(0.95)}
 .btn-forward{grid-column:2}
 .btn-left{grid-column:1;grid-row:2}
@@ -80,10 +80,10 @@ button:active{transform:scale(0.95)}
 <div class="card">
 <h2>Controls</h2>
 <div class="controls">
-<button class="btn-forward" onclick="cmd('w')">⬆<br>FORWARD</button>
-<button class="btn-left" onclick="cmd('a')">⬅<br>LEFT</button>
-<button class="btn-backward" onclick="cmd('s')">⬇<br>BACK</button>
-<button class="btn-right" onclick="cmd('d')">➡<br>RIGHT</button>
+<button class="btn-forward" onclick="cmd('w')"><br>FORWARD</button>
+<button class="btn-left" onclick="cmd('a')"><br>LEFT</button>
+<button class="btn-backward" onclick="cmd('s')"><br>BACK</button>
+<button class="btn-right" onclick="cmd('d')"><br>RIGHT</button>
 </div>
 <div class="servo-controls">
 <button onclick="cmd('o')">ARM UP</button>
@@ -170,10 +170,10 @@ void WebInterface::handleCommand() {
     motors->moveBackward(speedMS);
   }
   else if (c == "a") {
-    motors->turnLeft(speedMS);  // Removed the 0.7 multiplier
+    motors->turnLeft(speedMS);  
   }
   else if (c == "d") {
-    motors->turnRight(speedMS);  // Removed the 0.7 multiplier
+    motors->turnRight(speedMS); 
   }
   else if (c == "q") {
     motors->stop();

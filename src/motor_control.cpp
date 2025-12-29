@@ -28,7 +28,7 @@ void MotorControl::begin(Encoder* leftEnc, Encoder* rightEnc) {
   ledcAttachPin(MOTOR_LEFT_PWM, PWM_CHANNEL_LEFT);
   ledcAttachPin(MOTOR_RIGHT_PWM, PWM_CHANNEL_RIGHT);
   
-  Serial.println("✓ Motor control initialized");
+  Serial.println("Motor control initialized");
   
   // Test motors
   testMotors();
@@ -100,12 +100,12 @@ float MotorControl::calculatePID(float target, float current, float &error, floa
   float output = MOTOR_KP * error + MOTOR_KI * integral + MOTOR_KD * derivative;
   
   // Feedforward term for faster response
-  output += target * 300.0;  // Increased from 200.0
+  output += target * 300.0;  // Adjusted feedforward gain
   
   output = constrain(output, -MAX_SPEED, MAX_SPEED);
   
   // Reduced deadband compensation for faster start
-  if (abs(output) > 0 && abs(output) < 30) {  // Reduced from 50 to 30
+  if (abs(output) > 0 && abs(output) < 30) {  // Deadband threshold
     output = (output > 0) ? 30 : -30;
   }
   
@@ -169,12 +169,11 @@ void MotorControl::stop() {
   rightIntegral = 0;
   rightPrevError = 0;
   
-  Serial.println("STOP");
+
 }
 
 void MotorControl::setTargetSpeed(float left, float right) {
   if (autoStopped && (left > 0 || right > 0)) {
-    Serial.println("Cannot move forward - obstacle!");
     return;
   }
   
@@ -187,25 +186,20 @@ void MotorControl::setTargetSpeed(float left, float right) {
 }
 
 void MotorControl::moveForward(float speed) {
-  setTargetSpeed(speed, speed);
-  Serial.println("FORWARD at " + String(speed, 2) + " m/s");
+  setTargetSpeed(speed,-speed);
 }
 
 void MotorControl::moveBackward(float speed) {
-  setTargetSpeed(-speed, -speed);
-  Serial.println("BACKWARD at " + String(speed, 2) + " m/s");
+  setTargetSpeed(-speed, speed);
 }
 
 void MotorControl::turnLeft(float speed) {
-  // Left wheel backward, right wheel forward (pivot turn)
-  setTargetSpeed(-speed, speed);
-  Serial.println("LEFT TURN at " + String(speed, 2) + " m/s");
+  setTargetSpeed(speed, speed);
 }
 
 void MotorControl::turnRight(float speed) {
-  // Left wheel forward, right wheel backward (pivot turn)
-  setTargetSpeed(speed, -speed);
-  Serial.println("↷ RIGHT TURN at " + String(speed, 2) + " m/s");
+  setTargetSpeed(-speed,  -speed);
+
 }
 
 void MotorControl::setAutoStop(bool stopped) {

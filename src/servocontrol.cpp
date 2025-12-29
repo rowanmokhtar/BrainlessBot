@@ -23,25 +23,25 @@ void ServoControl::begin() {
   
 }
 
-void ServoControl::moveUp() {
+void ServoControl::moveDown() {
   int newPos = min(position + SERVO_STEP, SERVO_MAX);
   if (newPos != position) {
     position = newPos;
     servo.write(position);
-    Serial.println("ARM UP → " + String(position) + "°");
+  
   } else {
-    Serial.println("Already at maximum position");
+    Serial.println("Already MOVED DOWN");
   }
 }
 
-void ServoControl::moveDown() {
+void ServoControl::moveUp() {
   int newPos = max(position - SERVO_STEP, SERVO_MIN);
   if (newPos != position) {
     position = newPos;
     servo.write(position);
-    Serial.println("ARM DOWN → " + String(position) + "°");
+
   } else {
-    Serial.println("Already at minimum position");
+    Serial.println("Already MOVED UP");
   }
 }
 
@@ -50,7 +50,7 @@ void ServoControl::setPosition(int pos) {
   if (newPos != position) {
     position = newPos;
     servo.write(position);
-    Serial.println("SERVO → " + String(position) + "°");
+    
   }
 }
 
